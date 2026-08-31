@@ -1,21 +1,9 @@
 {
-  "sha1": "8a0f024b3250b6c21f47169efee34979d9d0060b",
+  "sha1": "931db3fd3b67105de22259faf9f3aaab76b711b6",
   "testChannels": [
-    "ci-on-commit",
-    "ci-batch-3h"
+    "ci-on-commit"
   ],
   "tests": [
-    {
-      "id": "145dd70ebc9c35e-9f78923f57eb20e",
-      "title": "Teardown environment for Significant Events API tests",
-      "expectedStatus": "passed",
-      "tags": [],
-      "location": {
-        "file": "x-pack/platform/plugins/shared/significant_events/test/scout/api/tests/global.teardown.ts",
-        "line": 5,
-        "column": 1
-      }
-    },
     {
       "id": "aba317166d7aac7-81c41da1351e0a5",
       "title": "Setup environment for Significant Events API tests",
@@ -23,8 +11,8 @@
       "tags": [],
       "location": {
         "file": "x-pack/platform/plugins/shared/significant_events/test/scout/api/tests/global.setup.ts",
-        "line": 5,
-        "column": 1
+        "line": 16,
+        "column": 27
       }
     },
     {
@@ -211,8 +199,8 @@
       ],
       "location": {
         "file": "x-pack/platform/plugins/shared/significant_events/test/scout/api/tests/workflows/managed_workflows.spec.ts",
-        "line": 37,
-        "column": 76
+        "line": 36,
+        "column": 74
       }
     },
     {
@@ -227,8 +215,8 @@
       ],
       "location": {
         "file": "x-pack/platform/plugins/shared/significant_events/test/scout/api/tests/workflows/managed_workflows.spec.ts",
-        "line": 37,
-        "column": 76
+        "line": 36,
+        "column": 74
       }
     },
     {
@@ -243,8 +231,8 @@
       ],
       "location": {
         "file": "x-pack/platform/plugins/shared/significant_events/test/scout/api/tests/workflows/managed_workflows.spec.ts",
-        "line": 37,
-        "column": 76
+        "line": 36,
+        "column": 74
       }
     },
     {
@@ -259,8 +247,19 @@
       ],
       "location": {
         "file": "x-pack/platform/plugins/shared/significant_events/test/scout/api/tests/workflows/managed_workflows.spec.ts",
-        "line": 37,
-        "column": 76
+        "line": 36,
+        "column": 74
+      }
+    },
+    {
+      "id": "145dd70ebc9c35e-9f78923f57eb20e",
+      "title": "Teardown environment for Significant Events API tests",
+      "expectedStatus": "passed",
+      "tags": [],
+      "location": {
+        "file": "x-pack/platform/plugins/shared/significant_events/test/scout/api/tests/global.teardown.ts",
+        "line": 5,
+        "column": 1
       }
     }
   ]
