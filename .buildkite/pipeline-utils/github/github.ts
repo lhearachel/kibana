@@ -7,7 +7,6 @@
  * License v3.0 only", or the "Server Side Public License, v 1".
  */
 
-import type { RestEndpointMethodTypes } from '@octokit/rest';
 import { Octokit } from '@octokit/rest';
 
 export const KIBANA_COMMENT_SIGIL = 'kbn-message-context';
@@ -16,16 +15,19 @@ const github = new Octokit({
   auth: process.env.GITHUB_TOKEN,
 });
 
-type PrChanges = RestEndpointMethodTypes['pulls']['listFiles']['response']['data'];
+export type ChangedFile = {
+  filename: string;
+  previous_filename?: string;
+};
 
-let prChangesCache: null | PrChanges = null;
-let commitChangesCache: null | PrChanges = null;
+let prChangesCache: null | ChangedFile[] = null;
+let commitChangesCache: null | ChangedFile[] = null;
 
 export const getPrChanges = async (
   owner = process.env.GITHUB_PR_BASE_OWNER,
   repo = process.env.GITHUB_PR_BASE_REPO,
   prNumber: undefined | string | number = process.env.GITHUB_PR_NUMBER
-) => {
+): Promise<ChangedFile[]> => {
   if (!owner || !repo || !prNumber) {
     throw Error(
       "Couldn't retrieve Github PR info from environment variables in order to retrieve PR changes"
@@ -51,7 +53,7 @@ export const getCommitChanges = async (
   owner = process.env.GITHUB_PR_BASE_OWNER,
   repo = process.env.GITHUB_PR_BASE_REPO,
   sha: undefined | string = process.env.GITHUB_PR_TRIGGERED_SHA
-) => {
+): Promise<ChangedFile[]> => {
   if (!owner || !repo || !sha) {
     throw Error(
       "Couldn't retrieve Github commit info from environment variables in order to retrieve commit changes"
@@ -65,7 +67,7 @@ export const getCommitChanges = async (
     per_page: 100,
   });
 
-  return (data.files ?? []) as PrChanges;
+  return data.files ?? [];
 };
 
 export const getCommitChangesCached = async () => {
@@ -76,7 +78,7 @@ export const getCommitChangesCached = async () => {
 export const areChangesSkippable = async (
   skippablePaths: RegExp[],
   requiredPaths: RegExp[] = [],
-  changes: null | RestEndpointMethodTypes['pulls']['listFiles']['response']['data'] = null
+  changes: null | ChangedFile[] = null
 ) => {
   const prChanges = changes || (await getPrChangesCached());
 
@@ -110,7 +112,7 @@ export const areChangesSkippable = async (
 
 export const doAllChangesMatch = async (
   path: RegExp,
-  changes: null | RestEndpointMethodTypes['pulls']['listFiles']['response']['data'] = null
+  changes: null | ChangedFile[] = null
 ) => {
   const prChanges = changes || (await getPrChangesCached());
 
@@ -129,7 +131,7 @@ export const doAllChangesMatch = async (
 
 export const doAnyChangesMatch = async (
   requiredPaths: RegExp[],
-  changes: null | RestEndpointMethodTypes['pulls']['listFiles']['response']['data'] = null
+  changes: null | ChangedFile[] = null
 ) => {
   const prChanges = changes || (await getPrChangesCached());
 
