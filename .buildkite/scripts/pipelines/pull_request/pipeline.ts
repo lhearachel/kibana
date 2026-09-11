@@ -26,7 +26,6 @@ import {
   emitPipeline,
   getPipeline,
   getCommitChangesCached,
-  getPrChangesCached,
   isScoutTestPath,
   isScoutTestsOnlyDiff,
   registerCancelKeys,
@@ -75,12 +74,12 @@ const isStorybookBuildAffected = async (): Promise<boolean> => {
     // On sparse&shallow checkout, git strategy doesn't work as expected,
     // we need to manually feed in changed files,
     // and make sure **/kibana.jsonc and **/tsconfig.json are included in the checkout
-    const prChanges = await getPrChangesCached();
+    const commitChanges = await getCommitChangesCached();
     const affectedPackages = await getAffectedPackages(undefined, {
       strategy: 'git',
       includeDownstream: true,
       ignoreUncategorizedChanges: true,
-      changedFiles: prChanges.flatMap((change) =>
+      changedFiles: commitChanges.flatMap((change) =>
         change.previous_filename ? [change.filename, change.previous_filename] : [change.filename]
       ),
     });
@@ -120,9 +119,9 @@ const isStorybookBuildAffected = async (): Promise<boolean> => {
     }
 
     // Scout-test-only diffs can't change OAS, API contracts, or Saved Objects, so skip those checks below.
-    const prChanges = await getPrChangesCached();
+    const commitChanges = await getCommitChangesCached();
     const scoutTestsOnly = isScoutTestsOnlyDiff(
-      prChanges.flatMap((change) =>
+      commitChanges.flatMap((change) =>
         change.previous_filename ? [change.filename, change.previous_filename] : [change.filename]
       )
     );
@@ -134,11 +133,11 @@ const isStorybookBuildAffected = async (): Promise<boolean> => {
 
     // The suite matchers below use plugin prefixes, which also match that plugin's Scout tests.
     // Drop those, so a Scout-only change can't trigger Cypress.
-    const isSuiteIrrelevantChange = (change: (typeof prChanges)[number]): boolean =>
+    const isSuiteIrrelevantChange = (change: (typeof commitChanges)[number]): boolean =>
       isScoutTestPath(change.filename) &&
       (!change.previous_filename || isScoutTestPath(change.previous_filename));
 
-    const suiteRelevantChanges = prChanges.filter((change) => !isSuiteIrrelevantChange(change));
+    const suiteRelevantChanges = commitChanges.filter((change) => !isSuiteIrrelevantChange(change));
 
     const doAnySuiteRelevantChangesMatch = (paths: RegExp[]): Promise<boolean> =>
       doAnyChangesMatch(paths, suiteRelevantChanges);

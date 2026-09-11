@@ -80,15 +80,15 @@ export const areChangesSkippable = async (
   requiredPaths: RegExp[] = [],
   changes: null | ChangedFile[] = null
 ) => {
-  const prChanges = changes || (await getPrChangesCached());
+  const commitChanges = changes || (await getCommitChangesCached());
 
-  if (prChanges.length >= 3000) {
+  if (commitChanges.length === 0 || commitChanges.length >= 3000) {
     return false;
   }
 
   if (requiredPaths?.length) {
     const someFilesMatchRequired = requiredPaths.some((path) =>
-      prChanges.some(
+      commitChanges.some(
         (change) => change.filename.match(path) || change.previous_filename?.match(path)
       )
     );
@@ -98,7 +98,7 @@ export const areChangesSkippable = async (
     }
   }
 
-  const someFilesNotSkippable = prChanges.some(
+  const someFilesNotSkippable = commitChanges.some(
     (change) =>
       !skippablePaths.some(
         (path) =>
@@ -114,7 +114,7 @@ export const doAllChangesMatch = async (
   path: RegExp,
   changes: null | ChangedFile[] = null
 ) => {
-  const prChanges = changes || (await getPrChangesCached());
+  const prChanges = changes || (await getCommitChangesCached());
 
   if (prChanges.length >= 3000) {
     return false;
@@ -133,14 +133,14 @@ export const doAnyChangesMatch = async (
   requiredPaths: RegExp[],
   changes: null | ChangedFile[] = null
 ) => {
-  const prChanges = changes || (await getPrChangesCached());
+  const commitChanges = changes || (await getCommitChangesCached());
 
-  if (prChanges.length >= 3000) {
+  if (commitChanges.length === 0 || commitChanges.length >= 3000) {
     return true;
   }
 
   const anyFilesMatchRequired = requiredPaths.some((path) =>
-    prChanges.some((change) => change.filename.match(path) || change.previous_filename?.match(path))
+    commitChanges.some((change) => change.filename.match(path) || change.previous_filename?.match(path))
   );
 
   return anyFilesMatchRequired;
