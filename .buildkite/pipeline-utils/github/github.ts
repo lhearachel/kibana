@@ -16,7 +16,10 @@ const github = new Octokit({
   auth: process.env.GITHUB_TOKEN,
 });
 
-let prChangesCache: null | RestEndpointMethodTypes['pulls']['listFiles']['response']['data'] = null;
+type PrChanges = RestEndpointMethodTypes['pulls']['listFiles']['response']['data'];
+
+let prChangesCache: null | PrChanges = null;
+let commitChangesCache: null | PrChanges = null;
 
 export const getPrChanges = async (
   owner = process.env.GITHUB_PR_BASE_OWNER,
@@ -42,6 +45,32 @@ export const getPrChanges = async (
 export const getPrChangesCached = async () => {
   prChangesCache = prChangesCache || (await getPrChanges());
   return prChangesCache;
+};
+
+export const getCommitChanges = async (
+  owner = process.env.GITHUB_PR_BASE_OWNER,
+  repo = process.env.GITHUB_PR_BASE_REPO,
+  sha: undefined | string = process.env.GITHUB_PR_TRIGGERED_SHA
+) => {
+  if (!owner || !repo || !sha) {
+    throw Error(
+      "Couldn't retrieve Github commit info from environment variables in order to retrieve commit changes"
+    );
+  }
+
+  const { data } = await github.repos.getCommit({
+    owner,
+    repo,
+    ref: sha,
+    per_page: 100,
+  });
+
+  return (data.files ?? []) as PrChanges;
+};
+
+export const getCommitChangesCached = async () => {
+  commitChangesCache = commitChangesCache || (await getCommitChanges());
+  return commitChangesCache;
 };
 
 export const areChangesSkippable = async (

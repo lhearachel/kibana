@@ -25,6 +25,7 @@ import {
   getAgentImageConfig,
   emitPipeline,
   getPipeline,
+  getCommitChangesCached,
   getPrChangesCached,
   isScoutTestPath,
   isScoutTestsOnlyDiff,
@@ -104,7 +105,14 @@ const isStorybookBuildAffected = async (): Promise<boolean> => {
       return;
     }
 
-    const skippable = await areChangesSkippable(SKIPPABLE_PR_MATCHERS, REQUIRED_PATHS);
+    const triggeredShaChanges = process.env.GITHUB_PR_TRIGGERED_SHA
+      ? await getCommitChangesCached()
+      : null;
+    const skippable = await areChangesSkippable(
+      SKIPPABLE_PR_MATCHERS,
+      REQUIRED_PATHS,
+      triggeredShaChanges
+    );
 
     if (skippable) {
       emitPipeline([emptyStep]);
