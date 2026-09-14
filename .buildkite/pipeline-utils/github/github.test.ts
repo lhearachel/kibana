@@ -7,16 +7,13 @@
  * License v3.0 only", or the "Server Side Public License, v 1".
  */
 
-import type { RestEndpointMethodTypes } from '@octokit/rest';
-import { areChangesSkippable, doAnyChangesMatch } from './github.ts';
+import { type ChangedFile, areChangesSkippable, doAnyChangesMatch } from './github.ts';
 
 describe('github', () => {
-  const getMockChangedFile = (filename: string, previousFilename = '') => {
-    return {
-      filename,
-      previous_filename: previousFilename || undefined,
-    } as RestEndpointMethodTypes['pulls']['listFiles']['response']['data'][number];
-  };
+  const getMockChangedFile = (filename: string, previousFilename = ''): ChangedFile => ({
+    filename,
+    previous_filename: previousFilename || undefined,
+  });
 
   describe('doAnyChangesMatch', () => {
     const required = [/^\/required/];
@@ -37,6 +34,13 @@ describe('github', () => {
           getMockChangedFile('/required/package.json'),
         ]);
 
+        expect(match).toEqual(true);
+      });
+    });
+
+    describe('should return true', () => {
+      it('when the changes list is empty', async () => {
+        const match = await doAnyChangesMatch(required, []);
         expect(match).toEqual(true);
       });
     });
@@ -64,6 +68,11 @@ describe('github', () => {
     const required = [/required\.md$/];
 
     describe('should not be skippable', () => {
+      it('when the changes list is empty', async () => {
+        const execute = await areChangesSkippable(skippable, required, []);
+        expect(execute).toEqual(false);
+      });
+
       it('when non-skippable files are present', async () => {
         const execute = await areChangesSkippable(skippable, required, [
           getMockChangedFile('docs/required.md'),

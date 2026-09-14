@@ -67,6 +67,7 @@ export const getCommitChanges = async (
     per_page: 100,
   });
 
+  // Merge-commits are sometimes represented by a nil-set of changed files
   return data.files ?? [];
 };
 
