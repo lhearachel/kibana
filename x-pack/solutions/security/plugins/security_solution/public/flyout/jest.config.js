@@ -19,4 +19,5 @@ module.exports = {
   setupFilesAfterEnv: [
     '<rootDir>/x-pack/solutions/security/plugins/security_solution/public/flyout/test/setup.ts',
   ],
+  workerIdleMemoryLimit: '2GB',
 };
